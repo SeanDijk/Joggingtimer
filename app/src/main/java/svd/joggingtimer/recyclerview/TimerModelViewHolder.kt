@@ -1,13 +1,12 @@
-package svd.joggingtimer.viewholders
+package svd.joggingtimer.recyclerview
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import svd.joggingtimer.R
-import svd.joggingtimer.model.TimerModel
-import svd.joggingtimer.toHHMMSS
-import java.sql.Time
+import svd.joggingtimer.domain.TimerModel
+import svd.joggingtimer.util.toHHMMSS
 
 /**
  * Created by Sean on 5-5-2018.

@@ -1,12 +1,11 @@
-package svd.joggingtimer
+package svd.joggingtimer.recyclerview
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import svd.joggingtimer.R
 import svd.joggingtimer.activities.TimerActivity
-import svd.joggingtimer.model.TimerModel
-import svd.joggingtimer.viewholders.TimerModelViewHolder
+import svd.joggingtimer.domain.TimerModel
 
 /**
  * Created by Sean on 5-5-2018.
@@ -22,7 +21,7 @@ class TimerModelRecyclerViewAdapter(val items: ArrayList<TimerModel>): RecyclerV
         val item = items[position]
         holder.bind(item)
         holder.itemView.setOnClickListener {
-            holder.itemView.context.startActivity(TimerActivity.getIntent(holder.itemView.context, item))
+            holder.itemView.context.startActivity(TimerActivity.createIntent(holder.itemView.context, item))
         }
     }
 

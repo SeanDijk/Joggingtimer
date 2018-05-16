@@ -1,4 +1,4 @@
-package svd.joggingtimer.model
+package svd.joggingtimer.domain
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

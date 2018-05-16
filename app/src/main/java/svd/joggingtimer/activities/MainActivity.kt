@@ -2,29 +2,30 @@ package svd.joggingtimer.activities
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import kotlinx.android.synthetic.main.activity_base.*
 
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.activity_main.*
 import svd.joggingtimer.R
-import svd.joggingtimer.TimerModelRecyclerViewAdapter
+import svd.joggingtimer.recyclerview.TimerModelRecyclerViewAdapter
 import svd.joggingtimer.TimerModelRepository
-import kotlin.concurrent.timer
 
 class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        enableFab().apply {
+            setImageResource(R.drawable.ic_add_white_24dp)
+            setOnClickListener { view ->
+                startActivity(CreateTimerActivity.createIntent(this@MainActivity))
+            }
         }
+
 
         timerRecyclerView.layoutManager = LinearLayoutManager(this)
         timerRecyclerView.adapter = TimerModelRecyclerViewAdapter(TimerModelRepository.models)

@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Jogging timer v3</string>
     <string name="action_settings">Settings</string>
+
+
+    <!--Lables for the pause/resume and stop buttons-->
+    <string name="button_resume">Resume</string>
+    <string name="button_pause">Pause</string>
+    <string name="button_stop">Stop</string>
+
+    <!--Hints for the Create Timer page-->
+    <string name="hint_name">Name</string>
+    <string name="hint_jogging_time">Jogging Time</string>
+    <string name="hint_resting_time">Resting time</string>
 </resources>

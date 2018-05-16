@@ -3,6 +3,7 @@
     package="svd.joggingtimer">
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,8 +20,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.TimerActivity" />
-        <activity android:name=".activities.BaseActivity"></activity>
+        <activity
+            android:name=".activities.TimerActivity"
+            android:parentActivityName=".activities.MainActivity" />
+        <activity android:name=".activities.BaseActivity" />
+
+        <service
+            android:name=".services.TimerService"
+            android:enabled="true"
+            android:exported="true" />
+
+
+        <activity android:name=".activities.CreateTimerActivity"></activity>
     </application>
 
 </manifest>
