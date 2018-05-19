@@ -10,6 +10,11 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by Sean on 5-5-2018.
  */
+
+fun from_HHMMSS_ToLong(hours: Int, minutes: Int, seconds: Int): Long {
+    return (hours*3600 + minutes * 60 + seconds).toLong() *1000
+}
+
 fun Long.toHHMMSS()= String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(this),
         TimeUnit.MILLISECONDS.toMinutes(this) % TimeUnit.HOURS.toMinutes(1),
         TimeUnit.MILLISECONDS.toSeconds(this) % TimeUnit.MINUTES.toSeconds(1))

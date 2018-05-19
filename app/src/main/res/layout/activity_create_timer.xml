@@ -18,6 +18,7 @@
         android:id="@+id/text_input_layout_name">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/nameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_name" />
@@ -35,11 +36,11 @@
         app:layout_constraintTop_toBottomOf="@+id/text_input_layout_name">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/jogTimerInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_jogging_time"
             android:focusableInTouchMode="false"
-            />
+            android:hint="@string/hint_jogging_time" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -54,10 +55,11 @@
         app:layout_constraintTop_toBottomOf="@+id/text_input_layout_jog">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/restTimerInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_resting_time"
+            android:focusable="false"
             android:focusableInTouchMode="false"
-            android:focusable="false"/>
+            android:hint="@string/hint_resting_time" />
     </android.support.design.widget.TextInputLayout>
 </android.support.constraint.ConstraintLayout>

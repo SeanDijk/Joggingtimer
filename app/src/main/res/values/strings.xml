@@ -12,4 +12,7 @@
     <string name="hint_name">Name</string>
     <string name="hint_jogging_time">Jogging Time</string>
     <string name="hint_resting_time">Resting time</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
