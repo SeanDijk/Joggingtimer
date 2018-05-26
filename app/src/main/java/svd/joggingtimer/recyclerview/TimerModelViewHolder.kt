@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import svd.joggingtimer.R
+import svd.joggingtimer.activities.CreateTimerActivity
 import svd.joggingtimer.domain.TimerModel
 import svd.joggingtimer.util.toHHMMSS
 
@@ -17,12 +18,15 @@ class TimerModelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val restTimeTextView = view.findViewById<TextView>(R.id.restTimeTextView)
 
     private val editImageView = view.findViewById<ImageView>(R.id.editImageView)
-    private val deliteImageView = view.findViewById<ImageView>(R.id.deleteImageView)
 
     fun bind(model : TimerModel){
         nameTextView.text = model.name
-        jogTimeTextView.text = model.joggingDuration.toHHMMSS() //todo convert to HH:MM:SS
-        restTimeTextView.text = model.restDuration.toHHMMSS() //todo convert to HH:MM:SS
+        jogTimeTextView.text = model.joggingDuration.toHHMMSS()
+        restTimeTextView.text = model.restDuration.toHHMMSS()
+
+        editImageView.setOnClickListener {
+            itemView.context.startActivity(CreateTimerActivity.createIntent(itemView.context, model))
+        }
     }
 
 }

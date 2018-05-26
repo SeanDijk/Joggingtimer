@@ -13,6 +13,7 @@ import android.widget.NumberPicker
 
 import svd.joggingtimer.R
 import svd.joggingtimer.util.from_HHMMSS_ToLong
+import java.util.concurrent.TimeUnit
 
 /**
  * A simple [Fragment] subclass.
@@ -24,12 +25,14 @@ import svd.joggingtimer.util.from_HHMMSS_ToLong
  */
 class TimerPickerFragment : DialogFragment() {
     private lateinit var mTag: String
+    private var mStartTime: Long = 0
     private var mListener: OnTimerTimeConfirmedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
             mTag = arguments!!.getString(ARG_TAG)
+            mStartTime = arguments!!.getLong(ARG_START_TIME)
         }
 
     }
@@ -49,16 +52,21 @@ class TimerPickerFragment : DialogFragment() {
                 findViewById<NumberPicker>(R.id.numberPickerHours).apply {
                     maxValue = 23
                     minValue = 0
+                    value = TimeUnit.MILLISECONDS.toHours(mStartTime).toInt()
                 }
 
                 findViewById<NumberPicker>(R.id.numberPickerMinutes).apply {
                     maxValue =59
                     minValue=0
+                    value = TimeUnit.MILLISECONDS.toMinutes(mStartTime).toInt()
+
                 }
 
                 findViewById<NumberPicker>(R.id.numberPickerSeconds).apply {
                     maxValue = 59
                     minValue =0
+                    value = TimeUnit.MILLISECONDS.toSeconds(mStartTime).toInt()
+
                 }
             }
             setView(view)
@@ -109,18 +117,23 @@ class TimerPickerFragment : DialogFragment() {
     }
 
     companion object {
-        private val ARG_TAG = "param1"
+        private val ARG_TAG = "ARG_TAG"
+        private val ARG_START_TIME = "ARG_START_TIME"
 
         /**
+         * Todo: update names
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
          * @param param1 Parameter 1.
          * @return A new instance of fragment TimerPickerFragment.
          */
-        fun newInstance(param1: String): TimerPickerFragment {
+        fun newInstance(param1: String, time: Long =0): TimerPickerFragment {
             return TimerPickerFragment().apply {
-                arguments = Bundle().apply { putString(ARG_TAG, param1) }
+                arguments = Bundle().apply {
+                    putString(ARG_TAG, param1)
+                    putLong(ARG_START_TIME, time)
+                }
             }
 
         }
