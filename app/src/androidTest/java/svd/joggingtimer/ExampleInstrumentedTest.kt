@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import org.junit.Assert.*
+import svd.joggingtimer.util.toHHMMSS
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -19,6 +20,10 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("svd.joggingtimer", appContext.packageName)
+        val test1 = 1000L
+        val test2 = 999L
+
+        assertEquals("00:00:01", test1.toHHMMSS())
+        assertEquals("00:00:00", test2.toHHMMSS())
     }
 }

@@ -9,11 +9,11 @@ import svd.joggingtimer.TimerData
  */
 class JoggingTimer(val timerModel: TimerModel) {
     enum class State {
-        JOG, REST
+        JOG, REST, STOPPED
     }
 
     var state = State.JOG
-        private set(value) {
+        private set(value) {//todo use depedency injection for this behaviour
             field = value
             TimerData.state.value = value
         }
@@ -24,7 +24,7 @@ class JoggingTimer(val timerModel: TimerModel) {
     private fun createTimer(duration: Long): CountDownTimer {
         return object : CountDownTimer(duration, 100) {
             override fun onTick(millisUntilFinished: Long) {
-                TimerData.timeLeft.value = millisUntilFinished
+                TimerData.timeLeft.value = millisUntilFinished //todo use depedency injection for this behaviour
             }
 
             override fun onFinish() {
@@ -47,17 +47,21 @@ class JoggingTimer(val timerModel: TimerModel) {
     fun start() {   timer.start()   }
     fun pause() {
         timer.pause()
-        TimerData.paused.value = true
+        TimerData.paused.value = true //todo use depedency injection for this behaviour
     }
     fun resume(){
         timer.resume()
-        TimerData.paused.value = false
+        TimerData.paused.value = false //todo use depedency injection for this behaviour
     }
-    fun stop()  {   timer.cancel()  }
+    fun stop()  {
+        timer.cancel()
+        TimerData.state.value = State.STOPPED //todo use depedency injection for this behaviour
+    }
     fun toggle(){
         if (timer.isPaused)
             resume()
         else
             pause()
     }
+
 }

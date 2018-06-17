@@ -14,15 +14,30 @@ import svd.joggingtimer.domain.JoggingTimer
 import svd.joggingtimer.util.NotificationChannelHandler
 import svd.joggingtimer.util.addButton
 import svd.joggingtimer.util.toHHMMSS
+import svd.joggingtimer.domain.JoggingTimer.State.*
+import svd.joggingtimer.util.actionhandler.ActionHandler
+import svd.joggingtimer.util.actionhandler.MediaPlayerHandler
+import svd.joggingtimer.util.actionhandler.SharedPrefHandlerChecker
+import svd.joggingtimer.util.actionhandler.VibrationHandler
 
 
 class TimerService : Service() {
     private var notificationBuilder : NotificationCompat.Builder? = null
     private lateinit var model: TimerModel
+
+    private val actionHandlersList: MutableList<ActionHandler> = ArrayList()
+
     var timer: JoggingTimer? = null
+
     override fun onBind(intent: Intent): IBinder? {
         // TODO: Return the communication channel to the service.
         throw UnsupportedOperationException("Not yet implemented")
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        actionHandlersList.add(VibrationHandler(this, SharedPrefHandlerChecker(this, getString(R.string.key_use_vibration)), 1000L)) //todo string in strings file
+        actionHandlersList.add(MediaPlayerHandler(this, SharedPrefHandlerChecker(this, getString(R.string.key_use_sound)), R.raw.alarm)) //todo string in strings file
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -44,49 +59,81 @@ class TimerService : Service() {
     }
 
     private fun start(){
-        println("started")
+        //Start the service and initialize the timer
         startForegroundService(applicationContext)
         timer = JoggingTimer(model)
 
+        //Observers when the time that gets displayed should change, and changes it in the notification
         TimerData.getTimeLeftAsStingLifeData().observeForever {
-            println("Observer: $it")
             when(timer!!.state) {
-                JoggingTimer.State.JOG -> setNotifcationText(it!! , model.restDuration.toHHMMSS())
-                JoggingTimer.State.REST -> setNotifcationText(model.joggingDuration.toHHMMSS(), it!!)
+                JOG -> {
+                    setNotificationText(it!! , model.restDuration.toHHMMSS())
+                }
+                REST -> {
+                    setNotificationText(model.joggingDuration.toHHMMSS(), it!!)
+                }
             }
         }
 
+        //Observes if the Timer gets paused or resumed and changes the action text in the notification accordingly.
         TimerData.paused.observeForever {
             if(it!!)
-                notificationBuilder?.mActions?.get(0)?.title = getString(R.string.button_resume) //todo add to strings file
+                notificationBuilder?.mActions?.get(0)?.title = getString(R.string.button_resume)
             else
-                notificationBuilder?.mActions?.get(0)?.title = getString(R.string.button_pause) //todo add to strings file
+                notificationBuilder?.mActions?.get(0)?.title = getString(R.string.button_pause)
             notifyNotification()
+        }
+
+        TimerData.state.observeForever {
+            if(it != STOPPED){
+                actionHandlersList.forEach { it.performAction() }
+            } else {
+                actionHandlersList.forEach { it.stopAction() }
+            }
         }
 
         timer?.start()
 
     }
 
+
+    /**
+     * Resumes the timer.
+     */
     private fun resume(){
         println("Resumed")
         timer?.resume()
     }
+
+    /**
+     * Pauses the timer.
+     */
     private fun pause(){
         println("Paused")
         timer?.pause()
     }
+
+    /**
+     * Stops the timer and the ForegroundService. This means the notification will disappear.
+     */
     private fun stop(){
         println("Stopped")
         timer?.stop()
         stopForegroundService()
     }
+
+    /**
+     * Toggles the timer between paused and resumed.
+     */
     private fun toggle(){
         println("Toggle")
         timer?.toggle()
     }
 
 
+    /**
+     * Builds the notification and starts the ForegroundService.
+     */
     private fun startForegroundService(context: Context) {
 
         notificationBuilder = NotificationCompat.Builder(this, NotificationChannelHandler.CHANNEL_TIMER_ID).apply {
@@ -98,6 +145,10 @@ class TimerService : Service() {
 //        bigTextStyle.setBigContentTitle("Placeholder")
 //        bigTextStyle.bigText("Placeholder 2")
 //        setStyle(bigTextStyle)
+            val a = android.support.v4.media.app.NotificationCompat.MediaStyle()
+            a.setShowActionsInCompactView(0,1)
+            setStyle(a)
+
             setWhen(System.currentTimeMillis())
             setSmallIcon(R.mipmap.ic_launcher)
             setLargeIcon( BitmapFactory.decodeResource(resources, R.drawable.ic_delete_black_24dp))
@@ -110,12 +161,13 @@ class TimerService : Service() {
 
             // Make head-up notification.
             setFullScreenIntent(pendingIntent, true)
+            //setContentIntent(pendingIntent)
 
 
             //Add pause/resume button
 
-            addButton(this@TimerService, TimerService::class.java, ACTION_TOGGLE_PAUSE, getString(R.string.button_pause)) //todo icon?
-            addButton(this@TimerService, TimerService::class.java, ACTION_STOP_SERVICE, getString(R.string.button_stop)) //todo icon?
+            addButton(this@TimerService, TimerService::class.java, ACTION_TOGGLE_PAUSE, getString(R.string.button_pause))
+            addButton(this@TimerService, TimerService::class.java, ACTION_STOP_SERVICE, getString(R.string.button_stop))
 
 
         }
@@ -129,12 +181,11 @@ class TimerService : Service() {
 
         // Stop foreground service and remove the notification.
         stopForeground(true)
-
         // Stop the foreground service.
         stopSelf()
     }
 
-    private fun setNotifcationText(jogTime: String, restTime: String){
+    private fun setNotificationText(jogTime: String, restTime: String){
         notificationBuilder?.setContentTitle("Jog time: $jogTime\nRest time: $restTime")
         notifyNotification()
     }

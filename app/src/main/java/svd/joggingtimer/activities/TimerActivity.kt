@@ -3,6 +3,7 @@ package svd.joggingtimer.activities
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_timer.*
 import svd.joggingtimer.R
@@ -10,7 +11,9 @@ import svd.joggingtimer.TimerData
 import svd.joggingtimer.domain.JoggingTimer
 import svd.joggingtimer.domain.TimerModel
 import svd.joggingtimer.services.TimerService
+import svd.joggingtimer.util.progresscircle.CircularSectionCircle
 import svd.joggingtimer.util.toHHMMSS
+import java.util.*
 
 
 class TimerActivity : BaseActivity() {
@@ -26,9 +29,14 @@ class TimerActivity : BaseActivity() {
             startService(TimerService.getIntent(this, it))
         }
 
-        //Set the Jog and Rest Timer strings to the start values
-        jogTimerTimeTextView.text = TimerData.model?.joggingDuration?.toHHMMSS()
-        restTimerTimeTextView.text = TimerData.model?.restDuration?.toHHMMSS()
+        initViews()
+
+        //Set the params of the Timer Circle.
+        timerCircle.setParams(listOf(
+                CircularSectionCircle.CircleParam(Color.YELLOW, TimerData.model?.joggingDuration!!.toInt()),
+                CircularSectionCircle.CircleParam(Color.BLUE, TimerData.model?.restDuration!!.toInt())
+        ))
+
 
         //Observer to update the Timer strings. Checks the state, so that the correct string is set.
         TimerData.getTimeLeftAsStingLifeData().observe(this, Observer {
@@ -44,20 +52,55 @@ class TimerActivity : BaseActivity() {
             }
         })
 
+        //Observes if the timer is paused to change the button string
         TimerData.paused.observe(this, Observer {
             if(it!!)
                 pauseResumeButton.setText(R.string.button_resume)
             else
                 pauseResumeButton.setText(R.string.button_pause)
         })
+        TimerData.state.observe(this, Observer {
+            if(it == JoggingTimer.State.STOPPED)
+                pauseResumeButton.setText(R.string.button_start)
+        })
 
-        //Starts the service.
-        //TimerData.model?.let {  }
-
+        //Update the progress bar
+        TimerData.timeLeft.observe(this, Observer {
+            if(TimerData.state.value == JoggingTimer.State.JOG)
+                timerCircle.setOffsetWeight((TimerData.model!!.joggingDuration -it!!).toFloat())
+            else if(TimerData.state.value == JoggingTimer.State.REST)
+                timerCircle.setOffsetWeight((TimerData.model!!.joggingDuration + (TimerData.model!!.restDuration - it!!)).toFloat())
+        })
 
         //Sets the button actions
-        pauseResumeButton.setOnClickListener { TimerService.toggleTimer(this) }
-        stopButton.setOnClickListener { TimerService.stopTimer(this) }
+        pauseResumeButton.setOnClickListener {
+            if(TimerData.state.value == JoggingTimer.State.STOPPED) {
+                startService(TimerService.getIntent(this, TimerData.model!!))
+                pauseResumeButton.setText(R.string.button_pause)
+            }
+            else {
+                TimerService.toggleTimer(this)
+            }
+        }
+
+        stopButton.setOnClickListener {
+            TimerService.stopTimer(this)
+            initViews()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(isFinishing){
+            TimerService.stopTimer(this)
+        }
+    }
+
+    private fun initViews(){
+        //Set the Jog and Rest Timer strings to the start values
+        jogTimerTimeTextView.text = TimerData.model?.joggingDuration?.toHHMMSS()
+        restTimerTimeTextView.text = TimerData.model?.restDuration?.toHHMMSS()
+        timerCircle.setOffsetWeight(0f)
     }
 
     companion object {
@@ -69,4 +112,6 @@ class TimerActivity : BaseActivity() {
             }
         }
     }
+
+
 }

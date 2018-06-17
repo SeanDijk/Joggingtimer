@@ -10,8 +10,11 @@ import svd.joggingtimer.util.toHHMMSS
  * Created by Sean on 11-5-2018.
  */
 object TimerData {
-    var totalTime: Long = 0
     var model: TimerModel? = null
+    set(value){
+        field = value
+        state.value = JoggingTimer.State.JOG
+    }
 
     var state = MutableLiveData<JoggingTimer.State>().apply { value = JoggingTimer.State.JOG }
     var paused = MutableLiveData<Boolean>().apply { value = false }

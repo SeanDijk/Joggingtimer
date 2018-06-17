@@ -17,13 +17,20 @@ fun from_HHMMSS_ToLong(hours: Int, minutes: Int, seconds: Int): Long {
     return (hours*3600 + minutes * 60 + seconds).toLong() *1000
 }
 
-fun Long.toHHMMSS()= String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(this),
-        TimeUnit.MILLISECONDS.toMinutes(this) % TimeUnit.HOURS.toMinutes(1),
-        TimeUnit.MILLISECONDS.toSeconds(this) % TimeUnit.MINUTES.toSeconds(1))
+//The +999 is applied so that the timer hits 0 exactly when it's done
+fun Long.toHHMMSS(): String {
+    val time = this+999
+    return String.format("%02d:%02d:%02d",
+            TimeUnit.MILLISECONDS.toHours(time),
+            TimeUnit.MILLISECONDS.toMinutes(time) % TimeUnit.HOURS.toMinutes(1),
+            TimeUnit.MILLISECONDS.toSeconds(time) % TimeUnit.MINUTES.toSeconds(1))
+}
 
 
 fun <T : Any?> NotificationCompat.Builder.addButton(context: Context, clazz: Class<T>, action: String, title:String = "Placeholder", drawableRef: Int = android.R.drawable.ic_media_play){
-    val intent = Intent(context, clazz).apply { this.action = action }
+    val intent = Intent(context, clazz).apply {
+        this.action = action
+    }
     val pendingIntent = PendingIntent.getService(context, 0, intent, 0)
     addAction(NotificationCompat.Action(drawableRef, title, pendingIntent))
 }
